@@ -74,20 +74,23 @@ exports.login = async(req,res)=>{
 
 exports.googleRegister=async(req,res)=>{
 try{
-    const{id,fname,lname,email,profileimg} = req.body
-    if(!id||!email||!fname||!lname){
+    const{
+        aud,family_name,given_name,email,picture} = req.body
+    if(!
+        aud||!email||!family_name||!given_name){
         res.status(401).json("Login failed")
     }
     else{
-        const exUser = await users1.findOne({googleID:id})
+        const exUser = await users1.findOne({googleID:
+            aud})
         if(!exUser){
-            const userNew = new users1({fname,lname,email,phone:"",role:"",password:"",address:"",profileimg:"",id})
+            const userNew = new users1({fname:given_name,lname:family_name,email:email,phone:"",role:"",password:"",address:"",profileimg:picture,googleID:aud})
             await userNew.save()
             const token = jwt.sign({id:userNew._id},"supersecertkey1234")
-            res.status(200).json({userNew,token})
+            res.status(200).json({user:userNew,token})
         }else{
             const token = jwt.sign({id:exUser._id},"supersecertkey1234")
-            res.status(200).json({userNew,token})
+            res.status(200).json({user:exUser,token})
         }
       
 

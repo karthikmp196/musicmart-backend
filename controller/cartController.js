@@ -49,7 +49,7 @@ exports.getFromCart=async(req,res)=>{
 
 try{
     const {uid} = req.params
-    const cartItems= await carts.findOne({uid}).populate('items.pid','pname productimage description')
+    const cartItems= await carts.findOne({uid}).populate('items.pid','pname productimage description price')
     if(cartItems){
         res.status(200).json(cartItems)
     }
@@ -94,3 +94,4 @@ exports.removeFromCart=async(req,res)=>{
 
 
 }
+

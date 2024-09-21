@@ -2,8 +2,10 @@ const express = require('express')
 const userController = require("../controller/userController")
 const productController = require('../controller/productController')
 const cartController = require('../controller/cartController')
+const orderController = require('../controller/orderController')
 const jwtAuthorization = require('../middlewares/jwtMiddleware')
 const multerConfig = require('../middlewares/multerMiddleware')
+const paymentController = require('../controller/paymentController')
 const router = new express.Router()
 
 router.post('/user/register',userController.register)
@@ -13,8 +15,10 @@ router.post('/admin/addproduct',jwtAuthorization,multerConfig.single('pimage') ,
 router.get('/admin/showproduct',productController.showProduct)
 router.put('/admin/editProduct/:id',jwtAuthorization,multerConfig.single('productimage'),productController.editProduct)
 router.delete('/admin/deleteProduct/:id',jwtAuthorization,productController.deleteProduct)
- router.post('/user/addToCart/:uid',jwtAuthorization,cartController.addToCart)
- router.get('/user/getFromCart/:uid',jwtAuthorization,cartController.getFromCart)
+router.post('/user/addToCart/:uid',jwtAuthorization,cartController.addToCart)
+router.get('/user/getFromCart/:uid',jwtAuthorization,cartController.getFromCart)
 router.post('/user/removeFromCart/:uid',jwtAuthorization,cartController.removeFromCart)
+router.post('/user/order/:uid',jwtAuthorization,orderController.orderProducts)
+router.post('/orders',paymentController.order)
 
 module.exports = router
