@@ -1,6 +1,6 @@
 const { passwordHashing, comparePassword } = require("../helper/password")
 const sendPasswordMail = require("../helper/sendmail")
-const users1 = require("../Models/userschema")
+const users1 = require('../Models/userSchema')
 const jwt = require('jsonwebtoken')
 
 

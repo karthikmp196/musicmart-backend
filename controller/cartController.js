@@ -2,6 +2,8 @@ const carts = require("../Models/cartSchema");
 
 
 exports.addToCart = async(req,res)=>{
+    console.log("inside add to cart");
+    
     try{
 
     
@@ -46,6 +48,7 @@ console.log(err);
 
 
 exports.getFromCart=async(req,res)=>{
+console.log("inside getfromcart");
 
 try{
     const {uid} = req.params
@@ -69,7 +72,8 @@ catch(err)
 }
 
 exports.removeFromCart=async(req,res)=>{
-    console.log("Inside cart controller");
+
+    console.log("Inside remove from cart");
     
     try{
         const {uid} = req.params
