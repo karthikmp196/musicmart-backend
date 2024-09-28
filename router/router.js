@@ -36,6 +36,14 @@ router.get('/admin/showUsers',userController.showUsers )
 //edit profile
 router.put('/user/editProfile/:id',jwtAuthorization,multerConfig.single('profileimg'),userController.editProfile)
 
+//otp verify
+router.post('/user/otpVerify',userController.otpVerify)
 
+//otp resend
+router.post('/user/resendOtp',userController.resendOtp)
+
+
+//pdf generation
+router.post('/pdfgeneration',orderController.pdf)
 
 module.exports = router

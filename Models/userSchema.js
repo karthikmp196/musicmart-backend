@@ -34,6 +34,16 @@ role:{
 },
 googleID:{
      type:String
+},
+otp:{
+  type:String
+},
+otpExpires:{
+    type:Date
+},
+isVerified:{
+    type:Boolean,
+    default:false
 }
 
 })

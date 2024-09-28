@@ -1,8 +1,9 @@
+const sendOtpMail = require("../helper/otpSend")
 const { passwordHashing, comparePassword } = require("../helper/password")
 const sendPasswordMail = require("../helper/sendmail")
 const users1 = require('../Models/userSchema')
 const jwt = require('jsonwebtoken')
-
+const otpGenerator=require('otp-generator')
 
 exports.register=async(req,res)=>{   
 try{
@@ -22,10 +23,15 @@ const existingUser = await users1.findOne({email})
 
    else
    { 
-
+    const otp = otpGenerator.generate(6, { upperCaseAlphabets: false,lowerCaseAlphabets:false, specialChars: false });
+    const otpExpires =  Date.now()+1*60*1000
+    await sendOtpMail(email,otp) 
     const hashedPassword= await passwordHashing(password)
+
+
+
     const newUser= new users1({
-        fname,lname,email,phone,password:hashedPassword,address,profileimg:""
+        fname,lname,email,phone,password:hashedPassword,address,profileimg:"",otp:otp, otpExpires:otpExpires
     })
     await newUser.save()
     res.status(200).json(newUser)
@@ -40,6 +46,122 @@ catch(err){
 }
 
 }
+
+// exports.otpVerify=async(req,res)=>{
+//     try{
+// const{otp,email}= req.body
+// const user = await users1.findOne({email})
+
+// if(!user)
+// {
+// res.status(404).json("user not exist")
+// }
+
+// else{
+//    const timeNow =  Date.now()
+//    if(timeNow  < user.otpExpires)
+//     {
+//     const mailOtp = user.otp
+    
+//     if(mailOtp == otp)
+//     {
+//         user.isVerified = true
+//         user.otp=null
+//         user. otpExpires = null
+       
+//         await user.save()
+//         res.status(200).json('otp matching')
+//     }
+//     else
+//     {
+//         res.status(405).json('otp not matching')
+//     }
+//     }
+//     else
+//    {
+//     res.status(407).json('Time Expired')
+//    }
+//  }} catch(err){
+// res.status(500).json("error")
+// console.log(err);
+
+//     }
+// }
+
+exports.otpVerify=async(req,res)=>{
+    try{
+      const {otp,email} = req.body
+      console.log("inside otpVerify");
+      
+      console.log(otp,email);
+      
+      const user = await users1.findOne({email})
+      if(!user){
+        res.status(406).json('email not valid')
+      }else{
+        
+        const timenow = Date.now()
+       if(timenow<user.otpExpires){
+        const mailotp = user.otp
+         if(mailotp == otp){
+            user.isVerified = true
+            user.otp=null
+            user.otpExpires=null
+            await user.save()
+            res.status(200).json('verified')
+        }else{
+            res.status(405).json('not matching')
+        }
+    }else{
+        res.status(407).json('time expired')
+    }
+      }
+      
+    }catch(err){
+        res.status(500).json('error')
+        console.log(err);
+        
+    }
+}
+
+exports.resendOtp=async(req,res)=>{
+    try{
+        
+        const{email} = req.body
+        console.log(email);
+        console.log("inside resensd");
+        
+        
+        const user = await users1.findOne({email})
+        const current = Date.now()
+        if(user.otpExpires < current){
+             const otp = otpGenerator.generate(6,{digits:true,upperCaseAlphabets:false,lowerCaseAlphabets:false,specialChars:false})
+             const otpExpires = Date.now()+1*60*1000           
+            await sendOtpMail(email,otp)
+            user.otp = otp
+            user.otpExpires = otpExpires
+            await user.save()
+            res.status(200).json(user)
+        }else{
+            res.status(406).json('not expired')
+        }
+
+    }catch(err){
+        res.status(500).json('error')
+        console.log(err);
+        
+    }
+}
+
+
+
+
+
+
+
+
+
+
 
 exports.login = async(req,res)=>{
     try{
